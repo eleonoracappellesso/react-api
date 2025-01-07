@@ -20,7 +20,11 @@ function MainComponent() {
             console.log(res.data);
             console.log(res.data.posts);
             setPosts(res.data.posts);
-        })
+        }).catch((error) => {
+            console.log(error);
+        }).finally(() => {
+
+        });
     }
 
     // funzione che accetta il nuovo post, crea una copia dell'array di post esistenti e aggiunge il nuovo
@@ -29,8 +33,9 @@ function MainComponent() {
     }
 
     function handleDeletePost(id) {
-        const updatedPostList = posts.filter(post => post.id !== id);
-        setPosts(updatedPostList);
+        axios.delete(myApiUrl + '/' + id).then((res) => {
+            setPosts(posts.filter(post => post.id !== id));
+        });
     }
 
     function handleTag(e) {
