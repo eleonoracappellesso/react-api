@@ -18,7 +18,8 @@ function MainComponent() {
     function getData() {
         axios.get(myApiUrl).then((res) => {
             console.log(res.data);
-            setPosts(res.data.data);
+            console.log(res.data.posts);
+            setPosts(res.data.posts);
         })
     }
 
