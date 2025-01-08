@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { tags } from "../data/post";
+import { useState, useEffect } from "react";
+// import { tags } from "../data/post";
+import axios from "axios";
 
 // stato iniziale del post
 const initialPost = {
@@ -7,25 +8,49 @@ const initialPost = {
     published: false,
     id: null,
     image: "",
-    // image: "https://via.placeholder.com/150",
     content: "",
 };
 
+const myApiUrl = "http://localhost:3000";
+
 function PostForm({ addPost }) {
-    const tagList = tags();
+    // const tagList = tags();
     const [post, setPost] = useState(initialPost);
     const [selectedTags, setSelectedTags] = useState([]); // Stato per i tag selezionati
 
-    function handleSubmit(event) {
-        event.preventDefault();
-        // controllo se il campo è vuoto
-        if (post.title.trim() === "") return;
-        // creo il nuovo post
-        const newPost = { ...post, id: Date.now(), tags: selectedTags };
-        // richiamo la funzione del contenitore padre e reimposto il form al valore iniziale
-        addPost(newPost);
-        setPost(initialPost);
-        setSelectedTags([]); // Resetta i tag selezionati
+    useEffect(() => {
+        getTags();
+    }, []);
+
+    function getTags() {
+        axios
+            .get(myApiUrl + "/tags")
+            .then((res) => {
+                console.log(res.data);
+                setSelectedTags(res.data.post);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+
+            });
+    }
+
+    function handleSubmit(post) {
+        axios.post(myApiUrl + "/posts", post).then((res) => {
+            console.log(res.data);
+            setPost([...post, res.data]);
+        });
+        // event.preventDefault();
+        // // controllo se il campo è vuoto
+        // if (post.title.trim() === "") return;
+        // // creo il nuovo post
+        // const newPost = { ...post, id: Date.now(), tags: selectedTags };
+        // // richiamo la funzione del contenitore padre e reimposto il form al valore iniziale
+        // addPost(newPost);
+        // setPost(initialPost);
+        // setSelectedTags([]); // Resetta i tag selezionati
     }
 
     function handleInput(event) {
@@ -85,7 +110,7 @@ function PostForm({ addPost }) {
                 </div>
                 <div className="card p-4 my-2">
                     <h6 className="mb-3">Seleziona i tag del tuo post:</h6>
-                    {tagList.map((tag) => (
+                    {selectedTags.map((tag) => (
                         <div className="mb-3 form-check" key={tag}>
                             <input
                                 type="checkbox"
