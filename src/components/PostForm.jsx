@@ -9,11 +9,12 @@ const initialPost = {
     id: null,
     image: "",
     content: "",
+    tags: []
 };
 
 const myApiUrl = "http://localhost:3000";
 
-function PostForm({ addPost }) {
+function PostForm({ setPosts }) {
     // const tagList = tags();
     const [post, setPost] = useState(initialPost);
     const [selectedTags, setSelectedTags] = useState([]); // Stato per i tag selezionati
@@ -27,7 +28,7 @@ function PostForm({ addPost }) {
             .get(myApiUrl + "/tags")
             .then((res) => {
                 console.log(res.data);
-                setSelectedTags(res.data.post);
+                setSelectedTags(res.data.tags);
             })
             .catch((error) => {
                 console.log(error);
@@ -37,12 +38,15 @@ function PostForm({ addPost }) {
             });
     }
 
-    function handleSubmit(post) {
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        console.log(post)
+
         axios.post(myApiUrl + "/posts", post).then((res) => {
             console.log(res.data);
-            setPost([...post, res.data]);
+            setPosts(prev => [...prev, res.data]);
         });
-        // event.preventDefault();
         // // controllo se il campo è vuoto
         // if (post.title.trim() === "") return;
         // // creo il nuovo post
@@ -61,11 +65,15 @@ function PostForm({ addPost }) {
 
     function handleTag(event) {
         const tag = event.target.value;
-        setSelectedTags((prevTags) =>
-            prevTags.includes(tag)
-                ? prevTags.filter((t) => t !== tag) // Rimuovi il tag se già selezionato
-                : [...prevTags, tag] // Aggiungi il tag se non selezionato
+        setPost((prev) => ({
+            ...prev,
+            tags: prev.tags.includes(tag)
+                ? prev.tags.filter((t) => t !== tag) // Rimuovi il tag se già selezionato
+                : [...prev.tags, tag] // Aggiungi il tag se non selezionato
+        })
+
         );
+
     }
 
     return (
@@ -111,18 +119,18 @@ function PostForm({ addPost }) {
                 <div className="card p-4 my-2">
                     <h6 className="mb-3">Seleziona i tag del tuo post:</h6>
                     {selectedTags.map((tag) => (
-                        <div className="mb-3 form-check" key={tag}>
+                        <div className="mb-3 form-check" key={`tag-${tag.id}`}>
                             <input
                                 type="checkbox"
                                 className="form-check-input"
                                 id={`tag-${tag}`}
                                 name="tags"
                                 onChange={handleTag}
-                                value={tag}
-                                checked={selectedTags.includes(tag)}
+                                value={tag.title}
+                            // checked={selectedTags.includes(tag.id)}
                             />
                             <label className="form-check-label" htmlFor={`tag-${tag}`}>
-                                {tag}
+                                {tag.title}
                             </label>
                         </div>
                     ))}

@@ -62,7 +62,7 @@ function MainComponent() {
                 ))}
             </section>
             {/*includo il form e gli passo la funzione per inviare il nuovo post al component padre, il main */}
-            <PostForm addPost={handleNewPost} removePost={handleDeletePost} handleTag={handleTag} />
+            <PostForm setPosts={setPosts} />
         </main>
     )
 }
